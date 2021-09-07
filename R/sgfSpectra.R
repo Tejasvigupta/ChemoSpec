@@ -15,7 +15,7 @@
 #'
 #' @return A object of class \code{\link{Spectra}}.
 #'
-#' @author Bryan A. Hanson, DePauw University.
+#' @template authors-BH
 #'
 #' @keywords utilities multivariate
 #'

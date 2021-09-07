@@ -1,5 +1,4 @@
 #'
-#'
 #' Plot PCA Loadings from a Spectra Object Against Each Other
 #'
 #' Plots two PCA loadings specified by the user, and labels selected (extreme)
@@ -21,11 +20,11 @@
 #' @param loads A vector of two integers specifying which loading vectors to
 #' plot.
 #'
-#' @template graphics-dots-arg
-#' @template tol-arg
-#' @template graphics-return-arg
+#' @template param-graphics-dots
+#' @template param-tol
+#' @template param-graphics-return
 #'
-#' @author Bryan A. Hanson, DePauw University,Tejasvi Gupta.
+#' @template authors-BH-TG
 #'
 #' @seealso See \code{\link{plotLoadings}} to plot one loading against the
 #' original variable (frequency) axis.  See \code{\link{sPlotSpectra}} for
@@ -37,9 +36,7 @@
 #' @export plot2Loadings
 #'
 #' @importFrom graphics plot abline legend
-#' @importFrom ChemoSpecUtils .getVarExplained
-#' @importFrom ggplot2 geom_text
-#' @importFrom ggrepel geom_text_repel
+#' @importFrom ggplot2 ggplot
 #' @importFrom magrittr %>%
 #' @importFrom plotly add_annotations
 #'
@@ -86,8 +83,6 @@ plot2Loadings <- function(spectra,
     abline(h = 0.0, col = "red")
     legend("bottomleft", y = NULL, pca$method, bty = "n", cex = 0.75)
 
-    # Next, if requested, we will label the extreme points on both dimensions
-
     if (is.numeric(tol)) .labelExtremes(pca$rotation[, loads], spectra$freq, tol)
 
     res <- data.frame(freq = spectra$freq, load1 = loadings1, load2 = loadings2)
@@ -95,7 +90,6 @@ plot2Loadings <- function(spectra,
   }
 
   if ((go == "ggplot2") || (go == "plotly")) {
-
     load1 <- load2 <- x <- y <- label <- NULL
     chkReqGraphicsPkgs("ggplot2")
 
@@ -116,17 +110,13 @@ plot2Loadings <- function(spectra,
       panel.grid.minor = element_blank()
     )
 
-    x.min <- min(loadings1)
-    y.min <- min(loadings2)
-    x.max <- max(loadings1)
-    x.min <- x.min + (x.max - x.min) / 5
-    p <- p + annotate("text", x = x.min, y = y.min, label = pca$method, size = 4)
+    p <- p + .ggAnnotate(pca$method, x = 0.05, y = 0.98, just = "left", gp = gpar(fontsize = 10))
 
     if (go == "ggplot2") {
       if (is.numeric(tol)) {
         CoordList <- .getExtremeCoords(pca$rotation[, loads], spectra$freq, tol)
         df <- data.frame(x = CoordList$x, y = CoordList$y, label = CoordList$l)
-        p <- p + geom_text_repel(data = df, aes(x = x, y = y, label = label), box.padding = 0.5, max.overlaps = Inf)
+        p <- p + .ggRepel(df)
       }
       return(p)
     } else {

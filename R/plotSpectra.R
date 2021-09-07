@@ -31,14 +31,11 @@
 #' @param showGrid Logical.  Places light gray vertical lines at each tick mark
 #' if \code{TRUE}.
 #'
-#' @param leg.loc A list giving x and y coordinates; if \code{"none"} no legend will be drawn.
-#' The plotting of the legend is based on the origin of the plot as [0,0] and the top right
-#' corner is [1,1]. If one wants the plot dead center use \code{leg.loc = list(x = 0.5, y = 0.5)}.
+#' @template param-legloc
+#' @template param-graphics-dots
+#' @template param-graphics-return
 #'
-#' @template graphics-dots-arg
-#' @template graphics-return-arg
-#'
-#' @author Bryan A. Hanson, DePauw University, Tejasvi Gupta.
+#' @template authors-BH-TG
 #'
 #' @seealso \code{\link{plotSpectraJS}} for the interactive version. See \code{\link{GraphicsOptions}}
 #'          for more information about the graphics options. Additional documentation at
@@ -49,31 +46,24 @@
 #' @export plotSpectra
 #'
 #' @importFrom graphics grid lines text points plot
-#' @importFrom ggplot2 aes annotate annotation_custom coord_cartesian element_blank
-#' @importFrom ggplot2 element_line element_text geom_line ggplot ggtitle labs
+#' @importFrom ggplot2 aes annotate element_blank
+#' @importFrom ggplot2 geom_line ggplot labs
 #' @importFrom ggplot2 scale_color_manual theme theme_bw theme_classic ylim
-#' @importFrom grid grobTree textGrob
 #' @importFrom reshape2 melt
 #' @importFrom plotly ggplotly
 #'
 #' @examples
-#'
+#' require("ggplot2")
 #' data(metMUD1)
 #'
-#' # Using base graphics (the default)
-#' options(ChemoSpecGraphics = "ggplot2")
-#'
-#' plotSpectra(metMUD1,
-#'   main = "metMUD1 NMR Data",
-#'   which = c(10, 11), yrange = c(0, 1.5),
+#' p1 <- plotSpectra(metMUD1, which = c(10, 11), yrange = c(0, 1.5),
 #'   offset = 0.06, amplify = 10, lab.pos = 0.5)
+#' p1 <- p1 + ggtitle("metMUD1 NMR Data")
 #'
 #' # Add a legend at x, y coords
-#' plotSpectra(metMUD1,
-#'   main = "metMUD1 NMR Data",
-#'   which = c(10, 11), yrange = c(0, 1.5),
-#'   offset = 0.06, amplify = 10, lab.pos = 0.5,
-#'   leg.loc = list(x = 0.8, y = 0.8))
+#' p2 <- plotSpectra(metMUD1, which = c(10, 11), yrange = c(0, 1.5),
+#'   offset = 0.06, amplify = 10, lab.pos = 0.5, leg.loc = list(x = 0.8, y = 0.8))
+#' p2 <- p2 + ggtitle("metMUD1 NMR Data")
 #'
 plotSpectra <- function(spectra, which = c(1),
                         yrange = range(spectra$data),
@@ -87,8 +77,8 @@ plotSpectra <- function(spectra, which = c(1),
   # spec: spectra data matrix with *samples in rows* (previously subsetted by which,
   #       & modified by offset & amplify)
   # pct: label position in % of y range
-  pct = 20.0
-  calcYpos <- function(spec, pct) {
+  pct <- 20.0
+  .calcLabelYpos <- function(spec, pct) {
     ymin <- apply(spec, 1, min)
     ymax <- apply(spec, 1, max)
     ypos <- ymin + (pct * (ymax - ymin)) / 100
@@ -125,14 +115,14 @@ plotSpectra <- function(spectra, which = c(1),
 
     # Add sample names
     lab.x <- lab.pos
-    lab.y <- calcYpos(M, pct)
+    lab.y <- .calcLabelYpos(M, pct)
     text(lab.x, lab.y, labels = Mnames, adj = c(0.5, 0.5), cex = 0.75)
 
     # Prep legend location if legend requested
     if (all(leg.loc != "none")) {
       x.min <- min(spectra$freq)
       x.max <- max(spectra$freq)
-      
+
       y.min <- yrange[1]
       y.max <- yrange[2]
       args <- as.list(match.call())[-1] # capture xlim if user passes it
@@ -147,7 +137,6 @@ plotSpectra <- function(spectra, which = c(1),
   }
 
   if ((go == "ggplot2") || (go == "plotly")) {
-
     value <- variable <- Frequency <- NULL # satisfy CRAN check engine
     chkReqGraphicsPkgs("ggplot2")
 
@@ -162,11 +151,12 @@ plotSpectra <- function(spectra, which = c(1),
     names(df) <- c("Frequency", spectra$names[which])
 
     lab.x <- lab.pos # values in native data space
-    lab.y <- calcYpos(t(as.matrix(df[, -1])), pct)
+    lab.y <- .calcLabelYpos(t(as.matrix(df[, -1])), pct)
 
     molten.data <- reshape2::melt(df, id = c("Frequency"))
 
-    p <- ggplot(data = molten.data,
+    p <- ggplot(
+      data = molten.data,
       aes(x = Frequency, y = value, group = variable, color = variable)) +
       geom_line() +
       scale_color_manual(name = "Key", values = spectra$colors[which]) +
@@ -181,15 +171,12 @@ plotSpectra <- function(spectra, which = c(1),
       p <- p + theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank())
     }
 
-    if( go == "ggplot2")
-    {
-    p<-.ggAddLegend(go,spectra,use.sym=FALSE,leg.loc,p)
-    return(p)
-    }
-    else
-    {
+    if (go == "ggplot2") {
+      p <- p + .ggAddLegend(spectra, use.sym = FALSE, leg.loc)
+      return(p)
+    } else {
       chkReqGraphicsPkgs("plotly")
-      p<-ggplotly(p,tooltip = c("Frequency"))
+      p <- ggplotly(p, tooltip = c("Frequency"))
       return(p)
     }
   }

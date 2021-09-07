@@ -13,11 +13,10 @@
 #'
 #' @param pc An integer specifying the desired pc plot.
 #'
-#' @template tol-arg
-#' @template graphics-dots-arg
-#' @template graphics-return-arg
-#'
-#' @author Matthew J. Keinsley and Bryan A. Hanson, DePauw University,Tejasvi Gupta.
+#' @template param-tol
+#' @template param-graphics-dots
+#' @template param-graphics-return
+#' @author Bryan A. Hanson (DePauw University), Tejasvi Gupta & Matthew J. Keinsley.
 #'
 #' @references Wiklund, Johansson, Sjostrom, Mellerowicz, Edlund, Shockcor,
 #' Gottfries, Moritz, and Trygg. "Visualization of GC/TOF-MS-Based
@@ -33,7 +32,7 @@
 #'
 #' @importFrom graphics plot abline legend
 #' @importFrom ggplot2 geom_vline
-#' @importFrom ggrepel geom_text_repel
+#' @importFrom magrittr %>%
 #'
 #' @examples
 #'
@@ -91,11 +90,10 @@ sPlotSpectra <- function(spectra,
 
     if (is.numeric(tol)) .labelExtremes(ans[, 2:3], spectra$freq, tol)
 
-    ans
+    return(ans)
   }
 
-  if ((go == "ggplot2")|| ( go == "plotly")) {
-
+  if ((go == "ggplot2") || (go == "plotly")) {
     x <- y <- label <- NULL
     chkReqGraphicsPkgs("ggplot2")
 
@@ -109,28 +107,20 @@ sPlotSpectra <- function(spectra,
       geom_vline(xintercept = 0, color = "red")
 
     p <- p + theme(
-      # Remove panel grid lines
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank()
     )
 
-    x.max <- max(cv)
-    x.min <- min(cv)
-    x.max <- x.max - (x.max - x.min) / 5
-    y.min <- min(crr)
-    p <- p + annotate("text", x = x.max, y = y.min, label = "centered/noscale/classical", size = 4)
-    
-    if (go == "ggplot2")
-    {
-    if (is.numeric(tol)) {
-      CoordList <- .getExtremeCoords(ans[, 2:3], spectra$freq, tol)
-      df <- data.frame(x = CoordList$x, y = CoordList$y, label = CoordList$l)
-      p <- p + geom_text_repel(data = df, aes(x = x, y = y, label = label), box.padding = 0.5, max.overlaps = Inf)
-    }
-    return(p)
-    }
-    else
-    {
+    p <- p + .ggAnnotate(pca$method, x = 0.05, y = 0.98, just = "left", gp = gpar(fontsize = 10))
+
+    if (go == "ggplot2") {
+      if (is.numeric(tol)) {
+        CoordList <- .getExtremeCoords(ans[, 2:3], spectra$freq, tol)
+        df <- data.frame(x = CoordList$x, y = CoordList$y, label = CoordList$l)
+        p <- p + .ggRepel(df)
+      }
+      return(p)
+    } else {
       chkReqGraphicsPkgs("plotly")
       p <- ggplotly(p)
       if (is.numeric(tol)) {

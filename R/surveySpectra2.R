@@ -68,8 +68,7 @@ surveySpectra2 <- function(spectra,
     text(x = lab.pos, y = off4, labels = lab, cex = 1.2, adj = c(0.5, 1))
   }
 
-  if ((go == "ggplot2")|| (go == "plotly")) {
-
+  if ((go == "ggplot2") || (go == "plotly")) {
     value <- variable <- Frequency <- NULL # satisfy CRAN check engine
     chkReqGraphicsPkgs("ggplot2")
 
@@ -100,18 +99,13 @@ surveySpectra2 <- function(spectra,
       labs(x = spectra$unit[1], y = "Centered Spectra")
     p <- p + geom_line(data = DF_spread, aes(x = x, y = y - off3))
 
-    p <- p + annotate(
-      geom = "text", x = lab.pos, y = off4, label = method,
-      color = "black"
-    )
-    if( go == "ggplot2")
-    {
-    return(p)
-    }
-    else
-    {
+    p <- p + .ggAnnotate(method, x = lab.pos, y = off4, gp = gpar(fontsize = 10))
+
+    if (go == "ggplot2") {
+      return(p)
+    } else {
       chkReqGraphicsPkgs("plotly")
-      p<-ggplotly(p,tooltip = "Frequency")
+      p <- ggplotly(p, tooltip = "Frequency")
       return(p)
     }
   }

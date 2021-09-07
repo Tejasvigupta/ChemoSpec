@@ -31,10 +31,10 @@
 #' done by \code{aov_pcaSpectra} is based on argument \code{fac}.  These may
 #' not correspond, but you can edit \code{spectra$groups} to match if necessary.
 #'
-#' @template graphics-return2-arg
-#' @template tol-arg
+#' @template param-graphics-return2
+#' @template param-tol
 #'
-#' @author Matthew J. Keinsley and Bryan A. Hanson, DePauw University.
+#' @template authors-BH-MK
 #'
 #' @seealso The use of this function can be seen in
 #' \code{\link{aov_pcaSpectra}}.  See also \code{\link{plotScores}}.
@@ -66,19 +66,22 @@ aovPCAscores <- function(spectra, so, submat = 1, ellipse = "none", tol = "none"
   go <- chkGraphicsOpt()
 
   if (go == "base") {
-    so <- so[[submat]] # need to force evaluation for some reason (do.call is downstream)
+    so <- so[[submat]] # need to force evaluation here for some reason (do.call is downstream)
     plotScores(spectra, so, ellipse = ellipse, tol = tol, use.sym = use.sym, leg.loc = leg.loc, ...)
     return(NULL)
   }
 
   if (go == "ggplot2") {
-    so <- so[[submat]] # need to force evaluation for some reason (do.call is downstream)
+    chkReqGraphicsPkgs("ggplot2")
+    so <- so[[submat]] # need to force evaluation here for some reason (do.call is downstream)
     p <- plotScores(spectra, so, ellipse = ellipse, tol = tol, use.sym = use.sym, leg.loc = leg.loc, ...)
     return(p)
   }
   
   if (go == "plotly") {
-    so <- so[[submat]] # need to force evaluation for some reason (do.call is downstream)
+    chkReqGraphicsPkgs("ggplot2")
+    chkReqGraphicsPkgs("plotly")
+    so <- so[[submat]] # need to force evaluation here for some reason (do.call is downstream)
     p <- plotScores(spectra, so, ellipse = ellipse, tol = tol, use.sym = use.sym, leg.loc = leg.loc, ...)
     return(p)
   }

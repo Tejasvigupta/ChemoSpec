@@ -29,7 +29,6 @@ output choice.
  }
 }
 \examples{
-
 \dontrun{
 data(metMUD1)
 reviewAllSpectra(metMUD1)
@@ -42,6 +41,6 @@ See \code{\link{GraphicsOptions}}
          \url{https://bryanhanson.github.io/ChemoSpec/}
 }
 \author{
-Bryan A. Hanson, DePauw University, Tejasvi Gupta.
+Bryan A. Hanson (DePauw University), Tejasvi Gupta.
 }
 \keyword{hplot}

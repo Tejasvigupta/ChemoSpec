@@ -21,7 +21,7 @@
 #'
 #' @return An object of S3 class \code{\link{Spectra}}.
 #'
-#' @author Bryan A. Hanson, DePauw University.
+#' @template authors-BH
 #'
 #' @seealso Additional documentation at \url{https://bryanhanson.github.io/ChemoSpec/}
 #'

@@ -19,7 +19,7 @@
 #'
 #' @docType package
 #'
-#' @author Bryan A. Hanson and Matthew J. Keinsley.
+#' @author Bryan A. Hanson (DePauw University), Tejasvi Gupta & Matthew J. Keinsley.
 #'
 #' Maintainer: Bryan A. Hanson \email{hanson@@depauw.edu}
 #'
@@ -44,7 +44,7 @@
 #' @importFrom ChemoSpecUtils sampleDist chkGraphicsOpt chkReqGraphicsPkgs
 #' @export sampleDist chkGraphicsOpt chkReqGraphicsPkgs
 #' 
-#' @importFrom ChemoSpecUtils .prepLegendCoords .ggAddLegend 
-#' @export .prepLegendCoords .ggAddLegend
+#' @importFrom ChemoSpecUtils .prepLegendCoords .ggAddLegend .ggAnnotate .ggRepel
+#' @export .prepLegendCoords .ggAddLegend .ggAnnotate .ggRepel
 #'
 NULL
